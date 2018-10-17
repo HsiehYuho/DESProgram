@@ -146,12 +146,26 @@ bool build_network(FILE* config_file, FILE* _stats, FILE* _log){
 
             // Export id
             token = strtok (NULL, " \n");
+            if(token == NULL){
+                strcat( msg, "does not have export id");
+                log_msg(msg);
+                return false;
+            }
             int export = atoi(token);
             if(!is_postive_int(token) || export >= cmp_num){
                 strcat( msg, "export does not exist" );
                 log_msg(msg);
                 return false;
             }
+            
+            // Should not have extra parameters
+            token = strtok (NULL, " \n");
+            if(token != NULL){
+                strcat( msg, "has too many parameters");
+                log_msg(msg);
+                return false;
+            }
+            
             
             // Update cmp_arr
             CMP* cmp = cmp_arr[id];
@@ -197,20 +211,20 @@ bool build_network(FILE* config_file, FILE* _stats, FILE* _log){
             // Check exports
             for(int i = 0; i < exports_num; i++){
                 token = strtok (NULL, " \n");
-                int export = atoi(token);
-                if(!is_postive_int(token) || export >= cmp_num){
+                if(!is_postive_int(token) || atoi(token) >= cmp_num){
                     strcat( msg, "export is invalid" );
                     log_msg(msg);
 
                     return false;
                 }
+                int export = atoi(token);
                 exports[i] = export;
             }
             
             // Check ends
             token = strtok (NULL, " \n");
             if(token != NULL){
-                strcat( msg, "should not have remains line" );
+                strcat( msg, "has too many parameters" );
                 log_msg(msg);
                 return false;
             }
@@ -235,7 +249,7 @@ bool build_network(FILE* config_file, FILE* _stats, FILE* _log){
         if(type == EXIT){
             token = strtok (NULL, " \n");
             if(token != NULL){
-                strcat( msg, "contains additional parameters" );
+                strcat( msg, "has too many parameters");
                 log_msg(msg);
                 return false;
             }
@@ -249,7 +263,7 @@ bool build_network(FILE* config_file, FILE* _stats, FILE* _log){
     
     // Should not have remaining lines
     if(fgets(buffer, BUFFER, config_file)){
-        log_msg("File does not match specified num of row");
+        log_msg("Num of rows does not match to total number of component");
         return false;
     }
     printf("Valid config file. \n");
@@ -357,7 +371,7 @@ void run_sim(double time_limit){
 void get_stats(){
     char stats[MSG_LENGTH];
     
-    log_stats("Stats: \n");
+    log_stats("Stats: ");
     
     // System data
     double avg_stays_in_sys, max_stays_in_sys, min_stays_in_sys;
@@ -398,6 +412,7 @@ void get_stats(){
             log_stats(stats);
         }
     }
+    log_stats("\n");
     
     free_cmps();
 }
@@ -478,5 +493,3 @@ void free_cmps(){
         free(cmp_arr[i]);
     }
 }
-
-
