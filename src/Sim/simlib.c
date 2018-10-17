@@ -6,11 +6,6 @@
 
 // Simulation clock variable
 static double now_time = 0.0;
-// Return current simulation time
-static double current_time (void)
-{
-	return (now_time);
-}
 //data struct
 typedef struct Customer{
 	double time_create;
@@ -71,7 +66,6 @@ static Component** component_list;
 static int component_size = -1;
 
 //functions declaration
-static double current_time (void);
 static int is_queue_empty(Queue *q);
 static Customer* out_queue(Queue* q);
 static void en_queue(Queue* q,Customer* c);
