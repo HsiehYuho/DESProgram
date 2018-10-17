@@ -13,7 +13,7 @@ Affiliation          : Georgia Institute of Technology
 ## Description
 -------------
 
-This is the program simulate discrete simulation program. More details can be found in documentation folder. Basically, we are building two parts of program, one part is the simulation program which contains generator (create customer), queue station (where customer get served), fork (a channel to distribute customers to different next stations) and exit (where cusomter leaves).
+This is the program simulate discrete event simulation. More details can be found in documentation folder. Basically, we built two parts of program, one part is the simulation program which contains generator (create customer), queue station (where customer get served), fork (a channel to distribute customers to different next stations) and exit (where customer leaves). The other is configuration program which read and write the config file to perform simulation
 
 ## Folder Structure
 -------------
@@ -58,3 +58,15 @@ After running the above example command, you should be able to see the output **
 -------------
 
 The terminal will output debug info for invalid parameters. The **log.txt** file will store the invalid config file information. The **stats.txt** will store the experiment results.
+
+Config validation test contains:
+
+Valid component
+1. The number of components should be aligned with given number. The type should be known, and the ID should be unique.
+2. Parameters in component should be either positive integer or double. 
+3. The correct number of parameter of corresponding  different components, also the type of them. 
+
+Valid connection
+1. G should not be any predecessor component of anyone
+2. G should not directly connect to X
+
