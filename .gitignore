@@ -1,0 +1,5 @@
+# Ignore file
+
+# Stats output
+./txt/log.txt
+./txt/stats.txt
