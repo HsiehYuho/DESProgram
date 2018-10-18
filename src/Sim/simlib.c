@@ -11,6 +11,7 @@ typedef struct Customer{
 	double time_create;
 	double time_stamp;// managed in library
 	double time_wait;
+	double time_serve;
     struct Customer* next;
     struct Customer* prev;
 }Customer;
@@ -57,10 +58,11 @@ typedef struct Event {
 	double timestamp;		// event timestamp
     int event_type;         // event type
     int component_id;       // id of component that handles the event
+	double serve_time;
 	struct Event *next;		// priority queue pointer
 }Event;
 // Future Event List
-static Event fel ={-1.0, -1,-1,NULL};
+static Event fel ={-1.0, -1,-1,0,NULL};
 // component list
 static Component** component_list;
 static int component_size = -1;
@@ -119,7 +121,8 @@ static Event* event_router(Customer* c,int component_id)
                 event = (Event*)malloc(sizeof(Event));
                 event->component_id = component_id;
                 event->event_type = DEPARTURE;
-                event->timestamp = now_time+randexp(queue->P);
+				event->serve_time = randexp(queue->P);
+                event->timestamp = now_time+ event->serve_time;
                 event->next = NULL;
             }else
                 event = NULL;
@@ -162,6 +165,7 @@ static void event_handle(Event* e)
         {
             Queue* queue = C2Q(component);
             Customer *c = out_queue(queue);
+			c->time_serve = e->serve_time;
             double next_time = simulation_serve(c,queue);
             Event* departure_event = event_router(c,queue->D);
             if(departure_event)
@@ -172,6 +176,7 @@ static void event_handle(Event* e)
             {
                 Event* next_departure_event = e;
                 next_departure_event->timestamp = next_time;
+				next_departure_event->serve_time = next_time - now_time;
                 schedule_event(next_departure_event);
             }else
                 free(e);
@@ -317,7 +322,7 @@ static double simulation_serve(Customer* customer,Queue* queue)
 
     total_customer++;
 	queue->total_customer++;
-	double wtime = now_time - customer->time_stamp;
+	double wtime = now_time - customer->time_stamp - customer->time_serve;
     total_wtime+= wtime;
 	customer->time_wait += wtime;
 	queue->total_wtime += wtime;
