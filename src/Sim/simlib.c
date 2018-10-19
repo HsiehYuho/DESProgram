@@ -1,3 +1,17 @@
+//
+//  simlib.c
+//  This simulation library is intended to implement the functions as follow:
+//  1. Build and return entities for network.
+//  2.Implement the function for each entity.
+//  3.Make event Handlers to manage the entities created.
+//  4.Maintain variables to collect statistics and create function to expose them.
+//  5.Build the simulation engine, executing simulation and destroying simulation.
+//
+//
+//  File written by Cheng Zhang on 10/16/18.
+// 
+//
+
 #include"simlib.h"
 #include<stdlib.h>
 #include<math.h>
@@ -294,6 +308,7 @@ static void clear_fork(Fork* f)
             free(f->D);
     }
 }
+//free data in queue
 static void clear_queue(Queue *q)
 {
     while(!is_queue_empty(q))
@@ -303,6 +318,7 @@ static void clear_queue(Queue *q)
             free(c);
     }
 }
+//create customer
 static double generate_customer(Generator* generator,double current_time,Customer** c)
 {
     double next_time = current_time+randexp(generator->P);
@@ -315,6 +331,7 @@ static double generate_customer(Generator* generator,double current_time,Custome
 	enter_customer++;
     return next_time;
 }
+//simulate serving process
 static double simulation_serve(Customer* customer,Queue* queue)
 {
     double serve_time = randexp(queue->P);
@@ -336,6 +353,7 @@ static double simulation_serve(Customer* customer,Queue* queue)
 		queue->max_wtime = wtime;
     return next_time;
 }
+//simulate forking process
 static int simulation_fork(Fork* fork)
 {
     double p = urand();
@@ -351,6 +369,7 @@ static int simulation_fork(Fork* fork)
 	printf("error simulation fork\n");
     return -1;
 }
+//simulate the exiting process and count some statistics
 static int simulation_exit(Exit* _exit,Customer* customer)
 {
 	exit_customer++;
@@ -361,9 +380,12 @@ static int simulation_exit(Exit* _exit,Customer* customer)
 		min_stay_time = stay_time;
 	if (max_stay_time < stay_time)
 		max_stay_time = stay_time;
+	//free memory allocated in generate_customer() function
     free(customer);
     return 0;
 }
+//create Generator component
+//P is the mean value of generating time
 int create_generator(int generator_id,double P,int D)
 {
     int ret = 0;
@@ -388,6 +410,8 @@ int create_generator(int generator_id,double P,int D)
         ret = -1;
     return ret;
 }
+//create Queue component
+//P is the mean value of serving time
 int create_queue(int queue_id, double P,int D)
 {
     int ret = 0;
@@ -410,6 +434,10 @@ int create_queue(int queue_id, double P,int D)
         ret = -1;
     return ret;
 }
+//create Fork component, 
+//K is the number of Fork's out port
+//P is the array of possiablity of ports
+//D is the component linked by out port
 int create_fork(int fork_id, int K,double* P, int* D)
 {
     int ret = 0;
@@ -451,6 +479,7 @@ int create_fork(int fork_id, int K,double* P, int* D)
     }while(0);
     return ret;
 }
+//create Exit component
 int create_exit(int exit_id)
 {
     int ret = 0;
@@ -465,6 +494,7 @@ int create_exit(int exit_id)
         ret = -1;
     return ret;
 }
+//init simulation, component_num is the total number of component in simulation
 int init_simulation(int component_num)
 {
     int ret = 0;
@@ -475,6 +505,7 @@ int init_simulation(int component_num)
         ret = -1;
     return ret;
 }
+//destroy memory allocated in simulation 
 void destroy_simulation()
 {
     for(int i=0;i<component_size;i++)
@@ -507,6 +538,5 @@ void run_simulation(double end_time)
 		now_time = e->timestamp;
         if (now_time > end_time) break;
 		event_handle(e);
-		//free (e);	// it is up to the event handler to free memory for parameters
 	}
 }
