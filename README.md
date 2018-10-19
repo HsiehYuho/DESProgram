@@ -5,7 +5,7 @@ Author          : Yu-Ho, Cheng
 
 Created         : October 1 , 2018
 
-Last Modified   : September 24, 2018
+Last Modified   : October 19, 2018
 
 Affiliation          : Georgia Institute of Technology
 
@@ -21,12 +21,13 @@ This is the program simulate discrete event simulation. More details can be foun
 
 ├── document  # Documentation files 
 
-├── txt       # Contains config.txt, stats.txt and log.txt
+├── txt       # Configs for building network config.txt, food_config.txt, and mm1_config
 
 ├── src       # Source files 
     
-    ├── Configuration # Program to read, validate, write config, stats and log 
-    ├── Sim # Libaray to simulate DES program
+ ├── Configuration # Program to read, validate, write config, stats and log 
+
+ ├── Sim # Libaray to simulate DES program
 
 ├── Makefile
 
@@ -34,7 +35,7 @@ This is the program simulate discrete event simulation. More details can be foun
 
 ## Compilation & Experiment
 -------------
-
+
 Please run make under DESProgram folder.
 ```
 make
@@ -49,7 +50,7 @@ Then please run exe file to simulate the experiment with required parameters and
 
 Example:
 ```
-./cpssim 100.0 txt/config.txt ./txt/stats.txt ./txt/log.txt
+./cpssim 240.0 txt/food_config.txt ./txt/stats.txt ./txt/log.txt
 ```
 
 After running the above example command, you should be able to see the output **stats.txt** and **log.txt** files in ./txt folder. 
@@ -64,7 +65,7 @@ Config validation test contains:
 Valid component
 1. The number of components should be aligned with given number. The type should be known, and the ID should be unique.
 2. Parameters in component should be either positive integer or double. 
-3. The correct number of parameter of corresponding  different components, also the type of them. 
+3. The correct number of parameter of corresponding  different components, also the type of them. 
 
 Valid connection
 1. G should not be any predecessor component of anyone
