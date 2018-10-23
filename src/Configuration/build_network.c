@@ -40,6 +40,8 @@ void print_cmp_arr(CMP** cmp_arr, int num_of_cmp);
 void log_msg(char* message);
 void free_cmps(void);
 bool is_connection_valid(CMP** cmp_arr, int cmp_num);
+bool check_has_exit(CMP** cmp_arr, int cmp_num);
+bool recursive_check(CMP** cmp_arr, int idx, bool* visited, int cmp_num);
 void get_stats(void);
 void log_stats(char* message);
 
@@ -328,8 +330,52 @@ bool is_connection_valid(CMP** cmp_arr, int cmp_num){
             }break;
         }
     }
+    // check at least one exit for one generator in the network
+    if(!check_has_exit(cmp_arr, cmp_num)){
+        log_msg("No exit for one of the network");
+        return false;
+    }
+    
     log_msg("Config Valid");
     return true;
+}
+
+bool check_has_exit(CMP** cmp_arr, int cmp_num){
+    bool visited[cmp_num];
+    for(int i = 0; i < cmp_num; i++){
+        visited[i] = false;
+    }
+    for(int i = 0; i < cmp_num; i++){
+        CMP* cmp = cmp_arr[i];
+        char type = cmp->type;
+        if(type == GENERATOR){
+            bool has_exit = recursive_check(cmp_arr,cmp_arr[i]->export,visited,cmp_num);
+            if(!has_exit){
+                return false;
+            }
+        }
+    }
+    return true;
+}
+bool recursive_check(CMP** cmp_arr, int idx, bool* visited, int cmp_num){
+    if(cmp_arr[idx]->type == EXIT){
+        return true;
+    }
+    if(visited[idx]){
+        return false;
+    }
+    visited[idx] = true;
+    if(cmp_arr[idx]->type == QUEUE){
+        return recursive_check(cmp_arr, cmp_arr[idx]->export, visited, cmp_num);
+    }
+    bool has_exit = false;
+    if(cmp_arr[idx]->type == FORK){
+        for(int i = 0; i < cmp_arr[idx]->exports_num; i++){
+            has_exit = has_exit || recursive_check(cmp_arr, cmp_arr[idx]->exports[i], visited, cmp_num);
+        }
+    }
+    return has_exit;
+    
 }
 
 void run_sim(double time_limit){
@@ -371,7 +417,7 @@ void run_sim(double time_limit){
 void get_stats(){
     char stats[MSG_LENGTH];
     
-    log_stats("Stats: ");
+    log_stats("Stats: \n");
     
     // System data
     double avg_stays_in_sys, max_stays_in_sys, min_stays_in_sys;
@@ -412,7 +458,6 @@ void get_stats(){
             log_stats(stats);
         }
     }
-    log_stats("\n");
     
     free_cmps();
 }
@@ -493,3 +538,5 @@ void free_cmps(){
         free(cmp_arr[i]);
     }
 }
+
+
